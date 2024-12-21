@@ -30,7 +30,7 @@ public class HomeController {
 
         //로그인된 상태
         Member loginMember = memberRepository.findById(memberId);
-        if(loginMember == null) {   //쿠키가 오래돼서 없을 수 있
+        if(loginMember == null) {   //쿠키가 오래돼서 없을 수 있음
             return "home";
         }
 
