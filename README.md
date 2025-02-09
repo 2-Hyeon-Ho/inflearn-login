@@ -64,3 +64,46 @@
     response.addCookie(cookie);
 ```
 
+# 02.09 공부내용
+### 세션
+세션을 통해 서버와 클라이언트간 중요정보를 전달하여 관리  
+
+세션을 직접 생성하여 개발  
+1. 세션생성
+- sessionId 생성(임의의 추정 불가한값으로 생성(UUID))
+- 세션저장소(서버)에 sessionId와 보관할 값 저장
+- sessionId로 응답쿠키를 클라이언트에 전달
+2. 세션조회
+- 클라이언트가 요청한 sessionId의 쿠키값으로 세션저장소(서버)에서 보관한 값 조회
+3. 세션만료
+- 클라이언트가 요청한 sessionId의 쿠키값으로 세션저장소(서버)에서 sessionId와 보관한 값 제거
+
+**테스트시에는 HttpServletResponse, HttpServletRequest 를 직접 사용할 수 없으므로 MockHttpServletRequest, Response를 사용**
+
+### 스프링 세션
+스프링에서는 @SessionAttribute를 통해 세션을 편리하게 사용할 수 있도록 지원  
+```
+@GetMapping("/")
+    public String homeLoginV3Spring(
+        @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member,
+        Model model) {
+
+        //세션에 회원데이터가 없으면 home
+        if(member == null) {
+            return "home";
+        }
+
+        //세션이 유지되면 로그인으로 이동
+        model.addAttribute("member", member);
+        return "loginHome";
+    }
+```
+
+### 세션의 타임아웃
+세션은 메모리에 생성하므로 특정시간이 지나면 삭제가 필요하다.  
+기본 조건은 30분 유지이고 지나면 삭제된다.
+```
+session.setMaxInactiveInterval(1800); //1800초
+```
+보통 30분마다 세션정보를 삭제한다면 세션을 사용중이더라도 30분마다 삭제되어 클라이언트 입장에서 번거러움이 있어 
+최근 세션요청시간으로 부터 30분뒤에 세션을 삭제하는 방식 택함
